@@ -32,7 +32,7 @@ public class GradeBookResourceService implements GradeBookResource {
     }
 
     private final String VALID_GRADE_REGEX
-            = "([A-D]|[a-d])[+-]?|E|F|I|W|Z|e|f|i|w|z";
+            = "([A-D]|[a-d])[+-]?|[eE]|[fF]|[iI]|[wW]|[zZ]";
 
     private boolean isValidGrade(String grade) {
         Pattern pattern = Pattern.compile(VALID_GRADE_REGEX);
@@ -43,31 +43,38 @@ public class GradeBookResourceService implements GradeBookResource {
     private boolean isValidGradeBookName(String name) {
         // GradeBoook title which must be a character string 
         //that begins with a non-whitespace character.
-        return !name.isEmpty() && !Character.isWhitespace(name.charAt(0));
+        return !name.toUpperCase().isEmpty() && !Character.isWhitespace(name.toUpperCase().charAt(0));
     }
 
     @Override
     public Response createGradeBook(String name) {
 
-        if (!isValidGradeBookName(name)) {
+        if (!isValidGradeBookName(name.toUpperCase())) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(name + " is not a valid gradeBook tilte.").build();
         }
 
-        if (gradeBookList.containsTitle(name)) {
+        if (gradeBookList.containsTitle(name.toUpperCase())) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("The title " + name + " already exist.").build();
         }
         //generate randon id
-        Random random = new Random();
-        Long id = random.nextLong() + 1;
         GradeBook gradeBook = new GradeBook();
-        gradeBook.setName(name);
-        gradeBook.setId(id);
+        gradeBook.setName(name.toUpperCase());
+        gradeBook.setId(getGradeBookID());
 
         gradeBookList.add(gradeBook);
         System.out.println("Created gradeBook Id: " + gradeBook.getId());
         return Response.status(Response.Status.OK).entity(gradeBook).build();
+    }
+    
+    private Long getGradeBookID(){
+        Random random = new Random();
+        Long id = random.nextLong() + 1;
+        if(id < 0){
+            id = Math.abs(id);
+        }
+        return id;
     }
 
     @Override
@@ -116,7 +123,7 @@ public class GradeBookResourceService implements GradeBookResource {
         // create a secondary copy
         secondaryGradeBookList.add(gradeBook);
 
-        return Response.status(Status.OK).build();
+        return Response.status(Response.Status.OK).entity(gradeBook).build();
     }
 
     @Override
@@ -152,7 +159,7 @@ public class GradeBookResourceService implements GradeBookResource {
                             + "with the given id: " + gradeBookId).build();
         }
 
-        Student current = gradeBook.getStudent(name);
+        Student current = gradeBook.getStudent(name.toUpperCase());
 
         if (current != null) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -160,14 +167,14 @@ public class GradeBookResourceService implements GradeBookResource {
                             + "with the given student name: " + name).build();
         }
 
-        if (!isValidGrade(grade)) {
+        if (!isValidGrade(grade.toUpperCase())) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(grade + " is not a valid grade.").build();
         }
 
         current = new Student();
-        current.setName(name);
-        current.setGrade(grade);
+        current.setName(name.toUpperCase());
+        current.setGrade(grade.toUpperCase());
 
         gradeBook.add(current);
         System.out.println("Created student: " + current.getName()
@@ -193,7 +200,7 @@ public class GradeBookResourceService implements GradeBookResource {
                             + "with the given id: " + gradeBookId).build();
         }
 
-        Student current = gradeBook.getStudent(name);
+        Student current = gradeBook.getStudent(name.toUpperCase());
 
         if (current == null) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -213,12 +220,12 @@ public class GradeBookResourceService implements GradeBookResource {
                             + "with the given id: " + gradeBookId).build();
         }
 
-        if (!isValidGrade(grade)) {
+        if (!isValidGrade(grade.toUpperCase())) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity(grade + " is not a valid grade.").build();
         }
 
-        Student current = gradeBook.getStudent(name);
+        Student current = gradeBook.getStudent(name.toUpperCase());
 
         if (current == null) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -226,8 +233,8 @@ public class GradeBookResourceService implements GradeBookResource {
                             + "with the given student name: " + name).build();
         }
 
-        current.setName(name);
-        current.setGrade(grade);
+        current.setName(name.toUpperCase());
+        current.setGrade(grade.toUpperCase());
 
         gradeBook.add(current);
         System.out.println("Updated student: " + current.getName()
@@ -267,7 +274,7 @@ public class GradeBookResourceService implements GradeBookResource {
                             + "with the given id: " + gradeBookId).build();
         }
 
-        if (gradeBook.removeStudentByName(name) == null) {
+        if (gradeBook.removeStudentByName(name.toUpperCase()) == null) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("There is no student in the given GradeBook "
                             + "with the given student name: " + name).build();
@@ -277,7 +284,7 @@ public class GradeBookResourceService implements GradeBookResource {
 
         if (secondaryGradeBookList.containsId(gradeBookId)) {
             gradeBook = secondaryGradeBookList.getGradeBookById(gradeBookId);
-            gradeBook.removeStudentByName(name);
+            gradeBook.removeStudentByName(name.toUpperCase());
             // update the secondary copy
             secondaryGradeBookList.add(gradeBook);
         }
