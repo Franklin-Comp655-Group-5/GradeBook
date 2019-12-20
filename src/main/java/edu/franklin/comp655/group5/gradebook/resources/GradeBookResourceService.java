@@ -43,7 +43,8 @@ public class GradeBookResourceService implements GradeBookResource {
     private boolean isValidGradeBookName(String name) {
         // GradeBoook title which must be a character string 
         //that begins with a non-whitespace character.
-        return !name.toUpperCase().isEmpty() && !Character.isWhitespace(name.toUpperCase().charAt(0));
+        return !name.toUpperCase().isEmpty() 
+                && !Character.isWhitespace(name.toUpperCase().charAt(0));
     }
 
     @Override
@@ -51,7 +52,10 @@ public class GradeBookResourceService implements GradeBookResource {
 
         if (!isValidGradeBookName(name.toUpperCase())) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(name + " is not a valid gradeBook tilte.").build();
+                    .entity(name + " is not a valid gradeBook tilte. "
+                            + "GradeBoook title must be a character string that"
+                            + " begins with a non-whitespace character.")
+                    .build();
         }
 
         if (gradeBookList.containsTitle(name.toUpperCase())) {
