@@ -27,12 +27,12 @@ public interface GradeBookResource {
     @PUT
     @Path("gradebook/{name}")
     @Consumes("application/x-www-form-urlencoded")
-    public Response createGradeBook(@PathParam("name") String name);
+    public Response updateGradeBook(@PathParam("name") String name);
 
     @POST
     @Path("gradebook/{name}")
     @Consumes("application/x-www-form-urlencoded")
-    public Response updateGradeBook(@PathParam("name") String name);
+    public Response createGradeBook(@PathParam("name") String name);
 
     @GET
     @Path("gradebook")
